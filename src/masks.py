@@ -6,7 +6,7 @@ def get_mask_card_number(card_number: Union[str]) -> Union[str]:
     принимает параметр card_number:
     возвращает маску номера карты
     """
-    masked_number = card_number[0:-12] + " " + "** ****" + card_number[-4:]
+    masked_number = card_number[0:-10] + " " + "** ****" + card_number[-4:]
     return masked_number
 
 

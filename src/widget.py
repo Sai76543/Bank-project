@@ -7,7 +7,7 @@ def mask_account_card(card_number: Union[str]) -> Union[str]:
     if "Счет" in card_number or "Счёт" in card_number:
         return get_mask_account(card_number)
 
-    elif "Visa" in card_number or "Maestro" in card_number:
+    elif "Visa" in card_number or "Maestro" in card_number or "MasterCard" in card_number:
         return get_mask_card_number(card_number)
 
 
