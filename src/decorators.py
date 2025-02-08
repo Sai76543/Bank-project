@@ -1,36 +1,37 @@
-from functools import wraps
-from typing import Any, Callable
+import functools
 
+def log(filename=None):
+    """
+    Декоратор для логирования начала, конца и результатов выполнения функции,
+    а также возникающих ошибок.
 
-def log(filename: Any) -> Callable:
-    """Логирует вызов функции и ее результат в файл или в консоль
-    :param filename: Путь к файлу для записи логов. Если не указан, логи выводятся в консоль.
-    :return:Декораор для логирования вызовов функции.
+    Args:
+        filename (str, optional): Имя файла для записи логов.
+                                     Если None, логи выводятся в консоль.
+                                     Defaults to None.
     """
 
-    def decorator(func: Callable) -> Callable:
-        @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
+    def decorator_log(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
             try:
                 result = func(*args, **kwargs)
-                log_message = f"{func.__name__} called with args: {args}, kwargs:{kwargs}. Result: {result}"
-                with open(filename, "a") as f:
-                    f.write(log_message + "\n")
-                print(log_message)
+                log_message = f"{func.__name__} ok\n"
+                if filename:
+                    with open(filename, "a") as f:
+                        f.write(log_message)
+                else:
+                    print(log_message, end="")
+                return result
             except Exception as e:
-                error_message = f"{func.__name__} error: {e}. Inputs:{args}, {kwargs}"
-                with open(filename, "a") as f:
-                    f.write(error_message + "\n")
-                print(error_message)
+                log_message = f"{func.__name__} error: {type(e).__name__}. Inputs: {args}, {kwargs}\n"
+                if filename:
+                    with open(filename, "a") as f:
+                        f.write(log_message)
+                else:
+                    print(log_message, end="")
+                raise  # Перевыбрасываем исключение
 
         return wrapper
 
-    return decorator
-
-
-@log(filename="test_log.txt")
-def my_function(x: int, y: int) -> int:
-    return x + y
-
-
-my_function(1, "t")
+    return decorator_log

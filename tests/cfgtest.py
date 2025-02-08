@@ -1,4 +1,5 @@
 import pytest
+import os
 
 @pytest.fixture
 def test_transactions():
@@ -78,3 +79,13 @@ def test_transactions():
             "to": "Счет 14211924144426031657"
         }
     ]
+
+# Фикстура для очистки лог-файла перед каждым тестом
+@pytest.fixture()
+def cleanup_log_file():
+    log_file = "test_log.txt"
+    if os.path.exists(log_file):
+        os.remove(log_file)
+    yield log_file
+    if os.path.exists(log_file):
+        os.remove(log_file)
