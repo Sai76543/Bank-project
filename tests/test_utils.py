@@ -87,3 +87,42 @@ class TestUtils(unittest.TestCase):
         transaction = {"operationAmount": {"amount": "100.00", "currency": {"code": "GBP"}}}
         with self.assertRaises(ValueError):
             get_transaction_amount_rub(transaction)
+
+
+import re
+from typing import List, Dict
+from collections import Counter
+
+def filter_by_description(transactions: List[Dict], search_string: str) -> List[Dict]:
+    """
+    Фильтрует список транзакций по наличию строки поиска в описании.
+
+    Args:
+        transactions: Список словарей с данными о банковских операциях.
+        search_string: Строка поиска.
+
+    Returns:
+        Список словарей, у которых в описании есть данная строка.
+    """
+    search_string = search_string.lower()  # Приводим к нижнему регистру для регистронезависимого поиска
+    result = [
+        transaction for transaction in transactions
+        if transaction.get("description") and re.search(search_string, transaction["description"].lower())
+    ]
+    return result
+
+
+def categorize_operations(transactions: List[Dict], category_field="description") -> Counter:
+    """
+    Категоризует операции по категориям, указанным в поле `category_field`, используя Counter.
+
+    Args:
+        transactions: Список словарей с данными о банковских операциях.
+        category_field: Ключ, содержащий категорию операции (по умолчанию "description").
+
+    Returns:
+        Counter, в котором ключи — это названия категорий, а значения — это количество операций в каждой категории.
+    """
+    categories = Counter(transaction.get(category_field) for transaction in transactions if transaction.get(category_field))
+    return categories
+

@@ -85,3 +85,67 @@ def test_sort_by_date_incorrect_formating_texting(test_dict_list_incorrect_date_
         sort_by_date(test_dict_list_incorrect_date_second_version) == (
             "Invalid isoformat string: 'четырнадцатое октября две" "тысячи восемнадцатого года'"
         )
+
+
+import unittest
+from src.processing import filter_by_description, categorize_operations, filter_by_state, sort_by_date
+from collections import Counter
+from datetime import datetime
+
+class TestProcessing(unittest.TestCase):
+
+    def test_filter_by_state(self):
+        transactions = [
+            {"state": "EXECUTED"},
+            {"state": "CANCELED"},
+            {"state": "EXECUTED"}
+        ]
+        result = filter_by_state(transactions, "EXECUTED")
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]["state"], "EXECUTED")
+
+    def test_sort_by_date(self):
+        transactions = [
+            {"date": "2024-01-01T10:00:00.000"},
+            {"date": "2024-01-03T10:00:00.000"},
+            {"date": "2024-01-02T10:00:00.000"}
+        ]
+        result = sort_by_date(transactions)
+        self.assertEqual(result[0]["date"], "2024-01-03T10:00:00.000")
+        result = sort_by_date(transactions, sort_by_date_descending=False)
+        self.assertEqual(result[0]["date"], "2024-01-01T10:00:00.000")
+
+
+    def test_filter_by_description(self):
+        transactions = [
+            {"description": "Перевод организации ООО \"Рога и копыта\""},
+            {"description": "Покупка в магазине \"Пятерочка\""},
+            {"description": "Оплата услуг связи"},
+            {"description": "Перевод другу"}
+        ]
+
+        result1 = filter_by_description(transactions, "перевод")
+        self.assertEqual(len(result1), 2)
+        self.assertEqual(result1[0]["description"], "Перевод организации ООО \"Рога и копыта\"")
+
+        result2 = filter_by_description(transactions, "магазине")
+        self.assertEqual(len(result2), 1)
+        self.assertEqual(result2[0]["description"], "Покупка в магазине \"Пятерочка\"")
+
+        result3 = filter_by_description(transactions, "нет совпадений")
+        self.assertEqual(len(result3), 0)
+
+    def test_categorize_operations(self):
+        transactions = [
+            {"description": "Перевод"},
+            {"description": "Покупка"},
+            {"description": "Оплата"},
+            {"description": "Перевод"},
+            {"description": "Покупка"}
+        ]
+
+        result = categorize_operations(transactions)
+        self.assertIsInstance(result, Counter)
+        self.assertEqual(result["Перевод"], 2)
+        self.assertEqual(result["Покупка"], 2)
+        self.assertEqual(result["Оплата"], 1)
