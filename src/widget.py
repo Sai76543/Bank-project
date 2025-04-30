@@ -11,18 +11,22 @@ def mask_account_card(card_number: Union[str]) -> Union[str]:
         return get_mask_card_number(card_number)
 
 
-def get_date(user_date: Union[str]) -> Union[str]:
-    """Функция получения даты в определенном формате и возвращает в формате ДД.ММ.ГГГГ"""
-    # Добавляем импорт библиотеки datetime
-    import datetime
-    # Преобразуем строку в объект datetime
-    date_format = datetime.datetime.strptime(user_date, "%Y-%m-%dT%H:%M:%S.%f")
-    # Форматируем дату в строку "ДД.ММ.ГГГГ"
-    new_date = date_format.strftime("%d.%m.%Y")
-    # Возвращаем отформатированную дату
-    return new_date
+def get_date(core_date: str) -> str:
+    """Принимает дату и время в формате ISO 8601, возвращает дату в формате ДД.ММ.ГГГГ"""
+    core_date_list = core_date.split("-")
+    if (
+        core_date_list[0].isdigit()
+        and core_date_list[1].isdigit()
+        and core_date_list[2][:2].isdigit
+        and len(core_date_list) == 3
+    ):
+        returned_date = core_date_list[2][:2] + "." + core_date_list[1] + "." + core_date_list[0]
+        return returned_date
+    raise ValueError("некорректный формат даты")
 
 
-print(mask_account_card("Visa Platinum 1234567891234567"))
-print(mask_account_card("Счет 35383033474447895560"))
-print(get_date("2024-03-11T02:26:18.671407"))
+
+
+print(mask_account_card("Union Pay 6010203040506070"))
+print(mask_account_card("Счет 73654108430135874305"))
+print(get_date("2000-03-11"))
